@@ -11,7 +11,9 @@ The Argos script adds a new submenu to the Cobalt Strike beacon context menu. Ea
 ### Disclaimer
 This script is intended for legitimate security testing purposes only. Please use responsibly and ensure that you have proper authorization before using it in a live environment.
 
+<p align="center">
 <img width="513" alt="image" src="https://github.com/YoruYagami/Argos/assets/70035442/63514c44-229c-46fa-98df-eb06c7449a13">
+</p>
 
 ### Menù structure
 ```
@@ -24,6 +26,7 @@ This script is intended for legitimate security testing purposes only. Please us
 │   ├─ Show Firewall Status
 │   └─ Show Firewall Configuration
 └─ PowerView
+    ├─ Import Powerview
     ├─ Local Admin Enumeration
     │   ├─ Enumerate all local admins
     │   └─ List local admins account names
