@@ -1,4 +1,5 @@
-### Argos Aggressor Script
+### Argos
+![DALL-E](https://github.com/YoruYagami/Argos/assets/70035442/1b96abda-950c-4fec-8f8b-7c6c263bba66)| width=100)
 
 Argos is an Aggressor script for Cobalt Strike, designed to enhance its capabilities and make it easier to perform various tasks. It provides a set of functions to interact with antivirus, firewall, and perform enumeration tasks using PowerView.
 
