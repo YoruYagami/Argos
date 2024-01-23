@@ -1,4 +1,4 @@
-### Argos
+# Argos
 <p align="center">
   <img src="https://github.com/YoruYagami/Argos/assets/70035442/1b96abda-950c-4fec-8f8b-7c6c263bba66" width="500">
 </p>
