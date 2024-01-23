@@ -30,7 +30,14 @@ sub showFirewallConfig {
     bpowerpick($1, "netsh firewall show config");
 }
 
-## PowerView functions for Cobalt Strike
+### PowerView functions for Cobalt Strike
+# Function to import POwerView from /usr/share/windows-resources/powersploit/Recon/PowerView.ps1
+sub importPowerView {
+    local('$beaconId');
+    $beaconId = $1;
+    bpowerpick($beaconId, "powershell-import /usr/share/windows-resources/powersploit/Recon/PowerView.ps1");
+}
+
 # Define functions for local admin enumeration
 sub invokeEnumerateLocalAdmin {
     bpowerpick($1, "Invoke-EnumerateLocalAdmin");
@@ -187,6 +194,7 @@ popup beacon_top {
 
         }
         menu "PowerView" {
+            item "Import PowerView" { importPowerView($1); }
             menu "Enumerate Local Admins" {
                 item "Enumerate all local admins" { invokeEnumerateLocalAdmin($1); }
                 item "List local admins account names" { invokeEnumerateLocalAdminSelectAccountName($1); }
