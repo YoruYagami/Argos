@@ -8,7 +8,9 @@ Argos is an Aggressor script for Cobalt Strike, designed to enhance its capabili
 ### Usage
 The Argos script adds a new submenu to the Cobalt Strike beacon context menu. Each function is represented as an item in the menu, allowing you to easily execute the function with a single click.
 
-<img width="506" alt="image" src="https://github.com/YoruYagami/Argos/assets/70035442/01caa219-6ae9-45a1-a87d-b1d06a24ff9f">
+<p align="center">
+<img width="513" alt="image" src="https://github.com/YoruYagami/Argos/assets/70035442/01caa219-6ae9-45a1-a87d-b1d06a24ff9f">
+</p>
 
 ### Disclaimer
 This script is intended for legitimate security testing purposes only. Please use responsibly and ensure that you have proper authorization before using it in a live environment.
