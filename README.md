@@ -1,6 +1,17 @@
 # Argos
+
+<h1 align="center">
+  <br>
+  <a href=""><img src="https://github.com/YoruYagami/Argos/assets/70035442/1b96abda-950c-4fec-8f8b-7c6c263bba66" width="500">
+  <br>
+  <img src="https://img.shields.io/badge/Maintained%3F-Yes-23a82c">
+  <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/YoruYagami/Argos">
+  <img src="https://img.shields.io/badge/Developed%20for-kali%20linux-blueviolet">
+</h1>
+
+
 <p align="center">
-  <img src="https://github.com/YoruYagami/Argos/assets/70035442/1b96abda-950c-4fec-8f8b-7c6c263bba66" width="500">
+  
 </p>
 
 Argos is an Aggressor script for Cobalt Strike, designed to enhance its capabilities and make it easier to perform various tasks. It provides a set of functions to interact with antivirus, firewall, and perform enumeration tasks using PowerView and Bloodhound and execute lateral movement / priv esc technique via mimikatz and PwerUp .
